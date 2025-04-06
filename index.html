@@ -13,46 +13,6 @@
   <source src="lofi-gangster.mp3" type="audio/mp3">
   Tu navegador no soporta audio.
 </audio>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCCqs4PxRwUQBwnwSyh7qDu5KWFi5ncHCU",
-    authDomain: "almacenamiento-97b74.firebaseapp.com",
-    projectId: "almacenamiento-97b74",
-    storageBucket: "almacenamiento-97b74.firebasestorage.app",
-    messagingSenderId: "732008206430",
-    appId: "1:732008206430:web:fdeec801a77accedc0a4cf",
-    measurementId: "G-MT7FYF9378"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const statusDiv = document.getElementById("status");
-
-  fetch("https://api.ipify.org?format=json")
-    .then(res => res.json())
-    .then(async data => {
-      const ip = data.ip;
-      const fecha = new Date();
-
-      try {
-        await addDoc(collection(db, "visitas"), {
-          ip: ip,
-          fecha: fecha
-        });
-        if (statusDiv) {
-          statusDiv.textContent = "✅ Visita registrada";
-        }
-      } catch (error) {
-        console.error("Error registrando visita:", error);
-        if (statusDiv) {
-          statusDiv.textContent = "❌ Error registrando visita";
-        }
-      }
-    });
-</script>
 
 <!-- BOTÓN PARA ACTIVAR / DESACTIVAR -->
 <div class="control-musica">
@@ -149,5 +109,66 @@
       
       
   </main>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCqs4PxRwUQBwnwSyh7qDu5KWFi5ncHCU",
+      authDomain: "almacenamiento-97b74.firebaseapp.com",
+      projectId: "almacenamiento-97b74",
+      storageBucket: "almacenamiento-97b74.firebasestorage.app",
+      messagingSenderId: "732008206430",
+      appId: "1:732008206430:web:fdeec801a77accedc0a4cf",
+      measurementId: "G-MT7FYF9378"
+    };
+  
+    // Inicializa Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+  
+    const tablaBody = document.querySelector("#tabla-visitas tbody");
+    const statusDiv = document.getElementById("status");
+  
+    // Registrar visita con IP
+    fetch("https://api.ipify.org?format=json")
+      .then(res => res.json())
+      .then(async data => {
+        const ip = data.ip;
+        const fecha = new Date().toISOString();
+  
+        try {
+          await addDoc(collection(db, "visitas"), {
+            ip: ip,
+            fecha: fecha
+          });
+  
+          statusDiv.textContent = "✅ Visita registrada";
+  
+          // Mostrar las visitas
+          mostrarVisitas();
+        } catch (error) {
+          console.error("Error registrando visita:", error);
+          statusDiv.textContent = "❌ Error registrando visita";
+        }
+      });
+  
+    // Función para mostrar las visitas
+    async function mostrarVisitas() {
+      const visitas = await getDocs(collection(db, "visitas"));
+  
+      visitas.forEach((doc) => {
+        const datos = doc.data();
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${datos.ip}</td>
+          <td>${new Date(datos.fecha).toLocaleString()}</td>
+        `;
+        tablaBody.appendChild(fila);
+      });
+    }
+  </script>
+  
 </body>
 </html>

@@ -111,9 +111,8 @@
   </main>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
   
-    // Configuración de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCCqs4PxRwUQBwnwSyh7qDu5KWFi5ncHCU",
       authDomain: "almacenamiento-97b74.firebaseapp.com",
@@ -124,14 +123,9 @@
       measurementId: "G-MT7FYF9378"
     };
   
-    // Inicializa Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
   
-    const tablaBody = document.querySelector("#tabla-visitas tbody");
-    const statusDiv = document.getElementById("status");
-  
-    // Registrar visita con IP
     fetch("https://api.ipify.org?format=json")
       .then(res => res.json())
       .then(async data => {
@@ -143,32 +137,13 @@
             ip: ip,
             fecha: fecha
           });
-  
-          statusDiv.textContent = "✅ Visita registrada";
-  
-          // Mostrar las visitas
-          mostrarVisitas();
+          console.log("✅ Visita registrada:", ip);
         } catch (error) {
-          console.error("Error registrando visita:", error);
-          statusDiv.textContent = "❌ Error registrando visita";
+          console.error("❌ Error guardando visita:", error);
         }
       });
-  
-    // Función para mostrar las visitas
-    async function mostrarVisitas() {
-      const visitas = await getDocs(collection(db, "visitas"));
-  
-      visitas.forEach((doc) => {
-        const datos = doc.data();
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-          <td>${datos.ip}</td>
-          <td>${new Date(datos.fecha).toLocaleString()}</td>
-        `;
-        tablaBody.appendChild(fila);
-      });
-    }
   </script>
+  
   
 </body>
 </html>

@@ -130,20 +130,24 @@
       .then(res => res.json())
       .then(async data => {
         const ip = data.ip;
-        const fecha = new Date().toLocaleString();
-
+        const ahora = new Date();
+  
+        const fecha = ahora.toLocaleDateString('es-AR'); // formato: DD/MM/AAAA
+        const hora = ahora.toLocaleTimeString('es-AR');  // formato: HH:MM:SS
   
         try {
           await addDoc(collection(db, "visitas"), {
             ip: ip,
-            fecha: fecha
+            fecha: fecha,
+            hora: hora
           });
-          console.log("✅ Visita registrada:", ip);
+          console.log("✅ Visita registrada:", ip, fecha, hora);
         } catch (error) {
           console.error("❌ Error guardando visita:", error);
         }
       });
   </script>
+  
   
   
 </body>

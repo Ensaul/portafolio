@@ -130,7 +130,8 @@
       .then(res => res.json())
       .then(async data => {
         const ip = data.ip;
-        const fecha = new Date().toISOString();
+        const fecha = new Date().toLocaleString();
+
   
         try {
           await addDoc(collection(db, "visitas"), {
